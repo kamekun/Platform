@@ -19,6 +19,8 @@ class PublicController extends BasePublicController
      */
     private $app;
 
+    private $disabledPage = false;
+
     public function __construct(PageRepository $page, Application $app)
     {
         parent::__construct();
@@ -36,9 +38,17 @@ class PublicController extends BasePublicController
 
         $this->throw404IfNotFound($page);
 
+        $currentTranslatedPage = $page->getTranslation(locale());
+        if ($slug !== $currentTranslatedPage->slug) {
+
+            return redirect()->to($currentTranslatedPage->locale . '/' . $currentTranslatedPage->slug, 301);
+        }
+
         $template = $this->getTemplateForPage($page);
 
-        return view($template, compact('page'));
+        $alternate = $this->getAlternateMetaData($page);
+
+        return view($template, compact('page', 'alternate'));
     }
 
     /**
@@ -52,7 +62,9 @@ class PublicController extends BasePublicController
 
         $template = $this->getTemplateForPage($page);
 
-        return view($template, compact('page'));
+        $alternate = $this->getAlternateMetaData($page);
+
+        return view($template, compact('page', 'alternate'));
     }
 
     /**
@@ -89,8 +101,27 @@ class PublicController extends BasePublicController
      */
     private function throw404IfNotFound($page)
     {
-        if ($page->status == 0 || is_null($page)) {
+        if (null === $page || $page->status === $this->disabledPage) {
             $this->app->abort('404');
         }
+    }
+
+    /**
+     * Create a key=>value array for alternate links
+     *
+     * @param $page
+     *
+     * @return array
+     */
+    private function getAlternateMetaData($page)
+    {
+        $translations = $page->getTranslationsArray();
+
+        $alternate = [];
+        foreach ($translations as $locale => $data) {
+            $alternate[$locale] = $data['slug'];
+        }
+
+        return $alternate;
     }
 }

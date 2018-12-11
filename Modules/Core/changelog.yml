@@ -1,9 +1,16 @@
 url: https://github.com/AsgardCms/Platform
 versions:
-    "@unreleased":
+    "3.6.1":
+        changed:
+            - Fixed routing issues with localization introduced in 3.6.0
+    "3.6.0":
+        added:
+            - New Hungarian translations
+            - new <code>i18nFile</code> & <code>normalFile</code> macros
         changed:
             - Updating Dutch translations
             - Fix Carbon locale
+            - Fixed how the admin url is parsed by reading the <code>path</code> instead of <code>url</code>
     "3.5.3":
         changed:
             - Updating Polish translations
