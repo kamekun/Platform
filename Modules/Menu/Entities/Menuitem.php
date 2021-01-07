@@ -2,7 +2,7 @@
 
 namespace Modules\Menu\Entities;
 
-use Dimsav\Translatable\Translatable;
+use Astrotomic\Translatable\Translatable;
 use Illuminate\Database\Eloquent\Model;
 use TypiCMS\NestableTrait;
 
@@ -27,6 +27,7 @@ class Menuitem extends Model
         'link_type',
         'locale',
         'class',
+        'description',
     ];
     protected $table = 'menu__menuitems';
 

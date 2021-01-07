@@ -1,5 +1,18 @@
 url: https://github.com/AsgardCms/Platform
 versions:
+    "3.4.0":
+        changed:
+            - Fixing corrupted fonts
+    "3.1.1":
+        changed:
+            - Upgrade Pusher client and sending additional options to the plugin
+    "3.1.0":
+        changed:
+            - Updated AdminLTE to version 2.4.0
+            - Use the pusher key read from configuration instead of env file
+    "3.0.3":
+        changed:
+            - Adding error styles on el-tabs
     "3.0.0":
         added:
             - <code>@route</code> directive to include all laravel routes, now accessible via javascript

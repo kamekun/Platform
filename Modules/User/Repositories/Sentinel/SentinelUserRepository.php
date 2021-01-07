@@ -4,6 +4,9 @@ namespace Modules\User\Repositories\Sentinel;
 
 use Cartalyst\Sentinel\Laravel\Facades\Activation;
 use Cartalyst\Sentinel\Laravel\Facades\Sentinel;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Modules\User\Entities\Sentinel\User;
 use Modules\User\Events\UserHasRegistered;
@@ -189,6 +192,39 @@ class SentinelUserRepository implements UserRepository
     }
 
     /**
+     * Paginating, ordering and searching through pages for server side index table
+     * @param Request $request
+     * @return LengthAwarePaginator
+     */
+    public function serverPaginationFilteringFor(Request $request): LengthAwarePaginator
+    {
+        $roles = $this->allWithBuilder();
+
+        if ($request->get('search') !== null) {
+            $term = $request->get('search');
+            $roles->where('first_name', 'LIKE', "%{$term}%")
+                ->orWhere('last_name', 'LIKE', "%{$term}%")
+                ->orWhere('email', 'LIKE', "%{$term}%")
+                ->orWhere('id', $term);
+        }
+
+        if ($request->get('order_by') !== null && $request->get('order') !== 'null') {
+            $order = $request->get('order') === 'ascending' ? 'asc' : 'desc';
+
+            $roles->orderBy($request->get('order_by'), $order);
+        } else {
+            $roles->orderBy('created_at', 'desc');
+        }
+
+        return $roles->paginate($request->get('per_page', 10));
+    }
+
+    public function allWithBuilder() : Builder
+    {
+        return $this->user->newQuery();
+    }
+
+    /**
      * Hash the password key
      * @param array $data
      */
@@ -224,11 +260,11 @@ class SentinelUserRepository implements UserRepository
      */
     private function checkForManualActivation($user, array &$data)
     {
-        if (Activation::completed($user) && !$data['activated']) {
+        if (Activation::completed($user) && !$data['is_activated']) {
             return Activation::remove($user);
         }
 
-        if (!Activation::completed($user) && $data['activated']) {
+        if (!Activation::completed($user) && $data['is_activated']) {
             $activation = Activation::create($user);
 
             return Activation::complete($user, $activation->code);

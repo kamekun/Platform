@@ -3,10 +3,6 @@
 use Illuminate\Routing\Router;
 
 /** @var Router $router */
-$router->bind('page', function ($id) {
-    return app(\Modules\Page\Repositories\PageRepository::class)->find($id);
-});
-
 $router->group(['prefix' => '/page', 'middleware' => ['api.token', 'auth.admin']], function (Router $router) {
     $router->get('pages', [
         'as' => 'api.page.page.index',
@@ -17,6 +13,11 @@ $router->group(['prefix' => '/page', 'middleware' => ['api.token', 'auth.admin']
         'as' => 'api.page.page.indexServerSide',
         'uses' => 'PageController@indexServerSide',
         'middleware' => 'token-can:page.pages.index',
+    ]);
+    $router->get('mark-pages-status', [
+        'as' => 'api.page.page.mark-status',
+        'uses' => 'UpdatePageStatusController',
+        'middleware' => 'token-can:page.pages.edit',
     ]);
     $router->delete('pages/{page}', [
         'as' => 'api.page.page.destroy',

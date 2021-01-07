@@ -21,7 +21,7 @@ abstract class BasePageTest extends TestCase
      */
     protected $page;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -54,12 +54,16 @@ abstract class BasePageTest extends TestCase
     {
         $app['path.base'] = __DIR__ . '/..';
         $app['config']->set('database.default', 'sqlite');
-        $app['config']->set('database.connections.sqlite', array(
+        $app['config']->set('database.connections.sqlite', [
             'driver' => 'sqlite',
             'database' => ':memory:',
             'prefix' => '',
-        ));
+        ]);
         $app['config']->set('translatable.locales', ['en', 'fr']);
+        $app['config']->set('laravellocalization.supportedLocales', [
+            'en' => ['asd' => 'asd'],
+            'fr' => ['asd' => 'asd'],
+        ]);
     }
 
     private function resetDatabase()

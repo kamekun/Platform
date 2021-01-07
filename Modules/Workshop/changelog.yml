@@ -1,6 +1,18 @@
 url: https://github.com/AsgardCms/Platform
 versions:
-    "3.0.0@unreleased":
+    "@unreleased":
+        added:
+            - Laravel 5.6 compatibility
+    "3.6.1":
+        changed:
+            - Fixed issue with incorrect binding to the laravel-modules Repository class
+    "3.5.1":
+        changed:
+            - Fixing issue with ThemeManager caused when a theme name has the same name as project name
+    "3.2.0":
+        changed:
+            - Generating the new listener on the <code>LoadingBackendTranslations</code> hook to send translations to VueJS
+    "3.0.0":
         changed:
             - Using correct version number on module detail view
             - The modules menu item weight has been changed to <code>30</code>.
@@ -26,7 +38,7 @@ versions:
     "2.0.0":
         added:
             - Laravel 5.4 compatibility
-            - Ability to add unreleased items in module changelog, by suffixing version with <code>@unreleased</code>
+            - Ability to add unreleased items in module changelog, by suffixing version with <code></code>
             - Protecting api routes with api admin middleware
         changed:
             - Using new more flexible way of handle permissions via middleware

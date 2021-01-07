@@ -3,19 +3,19 @@
 namespace Modules\Core\Console\Installers\Scripts;
 
 use Illuminate\Console\Command;
-use Illuminate\Filesystem\Filesystem;
 use Modules\Core\Console\Installers\SetupScript;
+use Modules\Core\Console\Installers\Writers\EnvFileWriter;
 
 class SetInstalledFlag implements SetupScript
 {
     /**
-     * @var Filesystem
+     * @var EnvFileWriter
      */
-    private $finder;
+    protected $env;
 
-    public function __construct(Filesystem $finder)
+    public function __construct(EnvFileWriter $env)
     {
-        $this->finder = $finder;
+        $this->env = $env;
     }
 
     /**
@@ -25,8 +25,12 @@ class SetInstalledFlag implements SetupScript
      */
     public function fire(Command $command)
     {
-        $env = $this->finder->get('.env');
-        $env = str_replace('INSTALLED=false', 'INSTALLED=true', $env);
-        $this->finder->put('.env', $env);
+        $vars = [];
+
+        $vars['installed'] = 'true';
+
+        $this->env->write($vars);
+
+        $command->info('The application is now installed');
     }
 }

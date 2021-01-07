@@ -13,7 +13,7 @@ class FileTest extends MediaTestCase
      */
     private $file;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -70,7 +70,7 @@ class FileTest extends MediaTestCase
     {
         $file = $this->createFile('my/file/name.jpg');
 
-        $this->assertEquals('http://localhost/name_smallThumb.jpg', $file->getThumbnail('smallThumb'));
+        $this->assertEquals('http://localhost/my/file/name_smallThumb.jpg', $file->getThumbnail('smallThumb'));
     }
 
     /** @test */
@@ -90,22 +90,6 @@ class FileTest extends MediaTestCase
             'mimetype' => 'image/jpg',
             'filesize' => '1024',
             'folder_id' => 0,
-        ]);
-    }
-
-    private function resetDatabase()
-    {
-        // Makes sure the migrations table is created
-        $this->artisan('migrate', [
-            '--database' => 'sqlite',
-        ]);
-        // We empty all tables
-        $this->artisan('migrate:reset', [
-            '--database' => 'sqlite',
-        ]);
-        // Migrate
-        $this->artisan('migrate', [
-            '--database' => 'sqlite',
         ]);
     }
 }

@@ -10,6 +10,8 @@ use Modules\Media\Events\FileIsUpdating;
 use Modules\Media\Events\FileWasCreated;
 use Modules\Media\Events\FileWasUpdated;
 use Modules\Media\Repositories\FileRepository;
+use Modules\Media\Repositories\FolderRepository;
+use Modules\Media\Services\FileService;
 use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -20,13 +22,21 @@ class EloquentFileRepositoryTest extends MediaTestCase
      */
     private $file;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
         $this->resetDatabase();
 
         $this->file = app(FileRepository::class);
+        $this->app['config']->set('asgard.media.config.files-path', '/assets/media/');
+    }
+
+    public function tearDown(): void
+    {
+        if ($this->app['files']->isDirectory(public_path('assets')) === true) {
+            $this->app['files']->deleteDirectory(public_path('assets'));
+        }
     }
 
     /** @test */
@@ -85,28 +95,27 @@ class EloquentFileRepositoryTest extends MediaTestCase
     {
         $this->createFile('my-file.jpg');
 
-        $uploadedFile = Mockery::mock(UploadedFile::class);
-        $fileInfo = Mockery::mock(SplFileInfo::class);
+        sleep(1);
+        $this->file->createFromFile(\Illuminate\Http\UploadedFile::fake()->image('my-file.jpg'));
+        sleep(1);
+        $this->file->createFromFile(\Illuminate\Http\UploadedFile::fake()->image('my-file.jpg'));
 
-        $fileInfo->shouldReceive('getSize')
-            ->andReturn(1024)
-            ->once();
+        $this->assertEquals('my-file_1.jpg', $this->file->find(2)->filename);
+        $this->assertEquals('my-file_2.jpg', $this->file->find(3)->filename);
+    }
 
-        $uploadedFile->shouldReceive('getClientOriginalName')
-            ->andReturn('my-file.jpg')
-            ->once();
-        $uploadedFile->shouldReceive('getClientMimeType')
-            ->andReturn('image/jpg')
-            ->once();
-        $uploadedFile->shouldReceive('getFileInfo')
-            ->andReturn($fileInfo)
-            ->once();
+    /** @test */
+    public function it_can_increment_file_name_version_to_a_number_higher_than_any_existing()
+    {
+        $file = $this->file->createFromFile(\Illuminate\Http\UploadedFile::fake()->image('my-file.jpg'));
+        $this->file->createFromFile(\Illuminate\Http\UploadedFile::fake()->image('my-file.jpg'));
+        $this->file->destroy($file);
+        sleep(1);
+        $this->file->createFromFile(\Illuminate\Http\UploadedFile::fake()->image('my-file.jpg'));
+        sleep(1);
+        $fileAgain = $this->file->createFromFile(\Illuminate\Http\UploadedFile::fake()->image('my-file.jpg'));
 
-        $this->file->createFromFile($uploadedFile);
-
-        $file = $this->file->find(2);
-
-        $this->assertEquals('my-file_1.jpg', $file->filename);
+        $this->assertEquals('my-file_2.jpg', $fileAgain->filename);
     }
 
     /** @test */
@@ -212,6 +221,62 @@ class EloquentFileRepositoryTest extends MediaTestCase
         $this->assertEquals('Hello World', $file->translate('en')->description);
     }
 
+    /** @test */
+    public function it_can_create_a_file_in_a_folder()
+    {
+        $folder = app(FolderRepository::class)->create(['name' => 'My Folder', 'parent_id' => 0]);
+        $file = $this->file->createFromFile(\Illuminate\Http\UploadedFile::fake()->image('my-file.jpg'), $folder->id);
+
+        $this->assertCount(2, $this->file->all());
+
+        $this->assertEquals('/assets/media/my-folder/my-file.jpg', $file->path->getRelativeUrl());
+        $this->assertEquals($folder->id, $file->folder_id);
+    }
+
+    /** @test */
+    public function it_can_create_a_file_in_sub_sub_folder()
+    {
+        $folderRepository = app(FolderRepository::class);
+        $folderRepository->create(['name' => 'My Folder', 'parent_id' => 0]);
+        $nestedFolder = $folderRepository->create(['name' => 'Nested Folder', 'parent_id' => 1]);
+
+        $file = $this->file->createFromFile(\Illuminate\Http\UploadedFile::fake()->image('my-file.jpg'), $nestedFolder->id);
+
+        $this->assertEquals('/assets/media/my-folder/nested-folder/my-file.jpg', $file->path->getRelativeUrl());
+        $this->assertEquals($nestedFolder->id, $file->folder_id);
+    }
+
+    /** @test */
+    public function it_can_fetch_all_files_only()
+    {
+        $folderRepository = app(FolderRepository::class);
+        $folderRepository->create(['name' => 'My Folder', 'parent_id' => 0]);
+        $this->createFile();
+        $this->createFile();
+
+        $this->assertCount(2, $this->file->allForGrid());
+    }
+
+    /** @test */
+    public function it_can_store_same_filename_in_other_folder_with_no_suffix()
+    {
+        $folderRepository = app(FolderRepository::class);
+        $folder = $folderRepository->create(['name' => 'My Folder', 'parent_id' => 0]);
+        $file = app(FileService::class)->store(\Illuminate\Http\UploadedFile::fake()->image('my-file.jpg'), $folder->id);
+        $fileTwo = app(FileService::class)->store(\Illuminate\Http\UploadedFile::fake()->image('my-file.jpg'));
+
+        $subFolder = $folderRepository->create(['name' => 'My Sub Folder', 'parent_id' => $folder->id]);
+        $fileThree = app(FileService::class)->store(\Illuminate\Http\UploadedFile::fake()->image('my-file.jpg'), $subFolder->id);
+
+        $this->assertTrue($this->app['files']->exists(public_path('/assets/media/my-file.jpg')));
+        $this->assertTrue($this->app['files']->exists(public_path('/assets/media/my-folder/my-file.jpg')));
+        $this->assertTrue($this->app['files']->exists(public_path('/assets/media/my-folder/my-sub-folder/my-file.jpg')));
+
+        $this->assertEquals('/assets/media/my-folder/my-file.jpg', $file->path->getRelativeUrl());
+        $this->assertEquals('/assets/media/my-file.jpg', $fileTwo->path->getRelativeUrl());
+        $this->assertEquals('/assets/media/my-folder/my-sub-folder/my-file.jpg', $fileThree->path->getRelativeUrl());
+    }
+
     private function createFile($fileName = 'random/name.jpg')
     {
         return File::create([
@@ -221,27 +286,6 @@ class EloquentFileRepositoryTest extends MediaTestCase
             'mimetype' => 'image/jpg',
             'filesize' => '1024',
             'folder_id' => 0,
-        ]);
-    }
-
-    private function resetDatabase()
-    {
-        // Makes sure the migrations table is created
-        $this->artisan('migrate', [
-            '--database' => 'sqlite',
-        ]);
-        // We empty all tables
-        $this->artisan('migrate:reset', [
-            '--database' => 'sqlite',
-        ]);
-        // Migrate
-        $this->artisan('migrate', [
-            '--database' => 'sqlite',
-        ]);
-
-        $this->artisan('migrate', [
-            '--database' => 'sqlite',
-            '--path'     => 'Modules/Tag/Database/Migrations',
         ]);
     }
 }

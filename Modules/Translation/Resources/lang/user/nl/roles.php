@@ -1,9 +1,7 @@
 <?php
 
 return [
-    'button' => [
-        'new-role' => 'Nieuwe rol',
-    ],
+    'new-role' => 'Nieuwe rol',
     'title' => [
         'roles' => 'Rollen',
         'edit' => 'Wijzig rol',
@@ -16,20 +14,30 @@ return [
     ],
     'table' => [
         'name' => 'Naam',
+        'slug' => 'URL onderdeel',
     ],
     'tabs' => [
         'data' => 'Data',
-        'permissions' => 'permissies',
+        'permissions' => 'Permissies',
     ],
     'form' => [
         'name' => 'Naam',
-        'slug' => 'Pad',
+        'slug' => 'URL onderdeel',
     ],
     'navigation' => [
         'back to index' => 'Terug naar rollen overzicht',
     ],
     'select all' => 'Alles selecteren',
     'deselect all' => 'Alles deselecteren',
-    'inherit' => 'Erf van rol',
     'swap' => 'Wisselen',
+    'allow all' => 'Alles toestaan',
+    'deny all' => 'Alles weigeren',
+    'inherit all' => 'Alles overnemen',
+    'allow' => 'Toestaan',
+    'deny' => 'Weigeren',
+    'inherit' => 'Overnemen van rol',
+    'list resource' => 'Rollen overzicht',
+    'create resource' => 'Rollen aanmaken',
+    'edit resource' => 'Rollen wijzigen',
+    'destroy resource' => 'Rollen verwijderen',
 ];

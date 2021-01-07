@@ -19,7 +19,7 @@ return [
         'keywords' => 'Sleutelwoorden',
     ],
     'validation' => [
-        'max_size' => 'De maximum grootte (:size) voor dit media folder werd bereikt.',
+        'max_size' => 'De maximum grootte (:size) voor deze map is bereikt.',
     ],
     'file-sizes' => [
         'B' => 'Bytes',
@@ -29,7 +29,16 @@ return [
         'TB' => 'Tb',
     ],
     'choose file' => 'Kies een bestand',
-    'insert' => 'Voeg dit bestand in',
+    'insert' => 'Voeg dit bestand toe',
     'file picker' => 'Bestandskiezer',
     'Browse' => 'Bladeren ...',
+    'upload file' => 'Upload bestand',
+    'remove media' => 'Verwijder bestand',
+    'some files not moved' => 'Sommige bestanden zijn niet verplaatst',
+    'files moved successfully' => 'Bestanden zijn succesvol verplaatst',
+    'list resource' => 'Media overzicht',
+    'create resource' => 'Media toevoegen',
+    'edit resource' => 'Media wijzigen',
+    'destroy resource' => 'Media verwijderen',
+    'file too large' => 'Bestand te groot. Het bestand moet kleiner zijn dan :size MB.',
 ];

@@ -55,7 +55,7 @@ abstract class RoutingServiceProvider extends ServiceProvider
         $router->group([
             'namespace' => $this->namespace,
             'prefix' => LaravelLocalization::setLocale(),
-            'middleware' => ['localizationRedirect', 'web'],
+            'middleware' => ['localeSessionRedirect', 'localizationRedirect', 'web'],
         ], function (Router $router) {
             $this->loadBackendRoutes($router);
             $this->loadFrontendRoutes($router);
@@ -106,7 +106,7 @@ abstract class RoutingServiceProvider extends ServiceProvider
         if ($api && file_exists($api)) {
             $router->group([
                 'namespace' => 'Api',
-                'prefix' => 'api',
+                'prefix' => LaravelLocalization::setLocale() . '/api',
                 'middleware' => config('asgard.core.core.middleware.api', []),
             ], function (Router $router) use ($api) {
                 require $api;

@@ -6,7 +6,7 @@ return [
         'edit translation' => 'Wijzig een vertaling',
     ],
     'button' => [
-        'create translation' => 'Creëer een vertaling',
+        'create translation' => 'Vertaling aanmaken',
     ],
     'table' => [
     ],
@@ -16,7 +16,7 @@ return [
     ],
     'validation' => [
     ],
-    'Clear translation cache' => 'Maak vertalingsgeheugen vrij',
+    'Clear translation cache' => 'Maak vertalingscache leeg',
     'Export' => 'Exporteren',
     'Import' => 'Importeren',
     'Import csv translations file' => 'Importeer CSV vertalingen',
@@ -32,4 +32,9 @@ return [
     'event' => 'Gebeurtenis',
     'created' => 'Aangemaakt',
     'edited' => 'Gewijzigd',
+    'revert history' => 'Geschiedenis terugdraaien',
+    'list resource' => 'Vertalingen overzicht',
+    'edit resource' => 'Vertalingen wijzigen',
+    'import resource' => 'Vertalingen importeren',
+    'export resource' => 'Vertalingen exporteren',
 ];

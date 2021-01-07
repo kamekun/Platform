@@ -18,7 +18,11 @@ return [
     'template' => 'Modèle de page',
     'is homepage' => 'Page d\'accueil ?',
     'body' => 'Contenu',
+    'status' => 'Status',
+    'pages were updated' => 'Les pages ont été modifiées',
 
+    'view-page' => 'Voir la page',
+    'edit-page' => 'Editez la page',
     'validation' => [
         'attributes' => [
             'title' => 'titre',
@@ -30,5 +34,7 @@ return [
         'product' => 'Produit',
         'article' => 'Article',
     ],
-    'back to index' => 'Retour vers l\'index des pages',
+    'navigation' => [
+        'back to index' => 'Retour vers l\'index des pages',
+    ],
 ];

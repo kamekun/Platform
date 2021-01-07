@@ -9,7 +9,7 @@ class SettingsTest extends BaseSettingTest
      */
     protected $setting;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->setting = app('Modules\Setting\Support\Settings');
@@ -55,6 +55,49 @@ class SettingsTest extends BaseSettingTest
         // Assert
         $setting = $this->setting->get('core::site-name', 'fr');
         $this->assertEquals('AsgardCMS_fr', $setting);
+    }
+
+    /** @test */
+    public function it_returns_correctly_if_setting_is_falsey()
+    {
+        // Prepare
+        $data = [
+            'blog::posts-per-page' => 0,
+        ];
+
+        // Run
+        $this->settingRepository->createOrUpdate($data);
+
+        // Assert
+        $setting = $this->setting->get('blog::posts-per-page');
+        $this->assertEquals(0, $setting);
+    }
+
+    /** @test */
+    public function it_returns_correctly_if_setting_for_locale_is_falsey()
+    {
+        // Prepare
+        $this->app['config']->set('asgard.block.settings', [
+            'display-some-feature' => [
+                'description' => 'block::settings.display-some-feature',
+                'view' => 'text',
+                'translatable' => true,
+            ],
+        ]);
+
+        $data = [
+            'block::display-some-feature' => [
+                'en' => 0,
+                'fr' => 1,
+            ],
+        ];
+
+        // Run
+        $this->settingRepository->createOrUpdate($data);
+
+        // Assert
+        $this->assertEquals(0, $this->setting->get('block::display-some-feature', 'en'));
+        $this->assertEquals(1, $this->setting->get('block::display-some-feature', 'fr'));
     }
 
     /** @test */

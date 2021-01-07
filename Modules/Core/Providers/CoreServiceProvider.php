@@ -4,9 +4,11 @@ namespace Modules\Core\Providers;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Str;
 use Modules\Core\Blade\AsgardEditorDirective;
 use Modules\Core\Console\DeleteModuleCommand;
 use Modules\Core\Console\DownloadModuleCommand;
@@ -16,6 +18,7 @@ use Modules\Core\Console\PublishThemeAssetsCommand;
 use Modules\Core\Events\BuildingSidebar;
 use Modules\Core\Events\EditorIsRendering;
 use Modules\Core\Events\Handlers\RegisterCoreSidebar;
+use Modules\Core\Events\LoadingBackendTranslations;
 use Modules\Core\Foundation\Theme\ThemeManager;
 use Modules\Core\Traits\CanGetSidebarClassForModule;
 use Modules\Core\Traits\CanPublishConfiguration;
@@ -42,6 +45,7 @@ class CoreServiceProvider extends ServiceProvider
             'auth.admin'            => 'AdminMiddleware',
             'public.checkLocale'    => 'PublicMiddleware',
             'localizationRedirect'  => 'LocalizationMiddleware',
+            'localeSessionRedirect' => 'LocaleSessionRedirectMiddleware',
             'can' => 'Authorization',
         ],
     ];
@@ -69,7 +73,7 @@ class CoreServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->singleton('asgard.isInstalled', function () {
-            return true === env('INSTALLED', false);
+            return true === config('asgard.core.core.is_installed');
         });
         $this->app->singleton('asgard.onBackend', function () {
             return $this->onBackend();
@@ -87,6 +91,10 @@ class CoreServiceProvider extends ServiceProvider
             BuildingSidebar::class,
             $this->getSidebarClassForModule('core', RegisterCoreSidebar::class)
         );
+        $this->app['events']->listen(LoadingBackendTranslations::class, function (LoadingBackendTranslations $event) {
+            $event->load('core', Arr::dot(trans('core::core')));
+            $event->load('sidebar', Arr::dot(trans('core::sidebar')));
+        });
     }
 
     /**
@@ -96,7 +104,7 @@ class CoreServiceProvider extends ServiceProvider
      */
     public function provides()
     {
-        return array();
+        return [];
     }
 
     /**
@@ -140,13 +148,10 @@ class CoreServiceProvider extends ServiceProvider
 
         $this->app->singleton('asgard.ModulesList', function () {
             return [
-                'block',
-                'blog',
                 'core',
                 'dashboard',
                 'media',
                 'menu',
-                'notification',
                 'page',
                 'setting',
                 'tag',
@@ -198,14 +203,14 @@ class CoreServiceProvider extends ServiceProvider
             $moduleConfig = $this->app['config']->get($configKey . '.useViewNamespaces');
 
             if (count($themes) > 0) {
-                if ($themes['backend'] !== null && array_get($moduleConfig, 'backend-theme') === true) {
+                if ($themes['backend'] !== null && Arr::get($moduleConfig, 'backend-theme') === true) {
                     $hints[] = $themes['backend'] . '/views/modules/' . $moduleName;
                 }
-                if ($themes['frontend'] !== null && array_get($moduleConfig, 'frontend-theme') === true) {
+                if ($themes['frontend'] !== null && Arr::get($moduleConfig, 'frontend-theme') === true) {
                     $hints[] = $themes['frontend'] . '/views/modules/' . $moduleName;
                 }
             }
-            if (array_get($moduleConfig, 'resources') === true) {
+            if (Arr::get($moduleConfig, 'resources') === true) {
                 $hints[] = base_path('resources/views/asgard/' . $moduleName);
             }
         }
@@ -262,7 +267,9 @@ class CoreServiceProvider extends ServiceProvider
 
         $localeConfig = $this->app['cache']
             ->tags('setting.settings', 'global')
-            ->remember("asgard.locales", 120,
+            ->remember(
+                'asgard.locales',
+                120,
                 function () {
                     return DB::table('setting__settings')->whereName('core::locales')->first();
                 }
@@ -345,8 +352,8 @@ class CoreServiceProvider extends ServiceProvider
      */
     private function onBackend()
     {
-        $url = app(Request::class)->url();
-        if (str_contains($url, config('asgard.core.core.admin-prefix'))) {
+        $url = app(Request::class)->path();
+        if (Str::contains($url, config('asgard.core.core.admin-prefix'))) {
             return true;
         }
 

@@ -1,11 +1,11 @@
 <?php
 
 return [
-   /*
-   |--------------------------------------------------------------------------
-   | The prefix that'll be used for the administration
-   |--------------------------------------------------------------------------
-   */
+    /*
+    |--------------------------------------------------------------------------
+    | The prefix that'll be used for the administration
+    |--------------------------------------------------------------------------
+    */
     'admin-prefix' => 'backend',
 
     /*
@@ -32,18 +32,18 @@ return [
     */
     'skin' => 'skin-blue',
 
-   /*
-   |--------------------------------------------------------------------------
-   | WYSIWYG Backend Editor
-   |--------------------------------------------------------------------------
-   | Define which editor you would like to use for the backend wysiwygs.
-   | These classes are event handlers, listening to EditorIsRendering
-   | you can define your own handlers and use them here
-   | Options:
-   | - \Modules\Core\Events\Handlers\LoadCkEditor::class
-   | - \Modules\Core\Events\Handlers\LoadSimpleMde::class
-   */
-   'wysiwyg-handler' => \Modules\Core\Events\Handlers\LoadCkEditor::class,
+    /*
+    |--------------------------------------------------------------------------
+    | WYSIWYG Backend Editor
+    |--------------------------------------------------------------------------
+    | Define which editor you would like to use for the backend wysiwygs.
+    | These classes are event handlers, listening to EditorIsRendering
+    | you can define your own handlers and use them here
+    | Options:
+    | - \Modules\Core\Events\Handlers\LoadCkEditor::class
+    | - \Modules\Core\Events\Handlers\LoadSimpleMde::class
+    */
+    'wysiwyg-handler' => \Modules\Core\Events\Handlers\LoadCkEditor::class,
     /*
     |--------------------------------------------------------------------------
     | Custom CKeditor configuration file
@@ -63,26 +63,26 @@ return [
     | Backend and Frontend routes.
     */
     'middleware' => [
-       'backend' => [
-           'auth.admin',
-       ],
-       'frontend' => [
-       ],
-       'api' => [
-           'api',
-       ],
+        'backend' => [
+            'auth.admin',
+        ],
+        'frontend' => [
+        ],
+        'api' => [
+            'api',
+        ],
     ],
 
-   /*
-   |--------------------------------------------------------------------------
-   | Define which assets will be available through the asset manager
-   |--------------------------------------------------------------------------
-   | These assets are registered on the asset manager
-   */
+    /*
+    |--------------------------------------------------------------------------
+    | Define which assets will be available through the asset manager
+    |--------------------------------------------------------------------------
+    | These assets are registered on the asset manager
+    */
     'admin-assets' => [
         // Css
         'bootstrap.css' => ['theme' => 'vendor/bootstrap/dist/css/bootstrap.min.css'],
-        'font-awesome.css' => ['theme' => 'vendor/font-awesome/css/font-awesome.min.css'],
+        'font-awesome.css' => ['cdn' => 'https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css'],
         'alertify.core.css' => ['theme' => 'css/vendor/alertify/alertify.core.css'],
         'alertify.default.css' => ['theme' => 'css/vendor/alertify/alertify.default.css'],
         'dataTables.bootstrap.css' => ['theme' => 'vendor/datatables.net-bs/css/dataTables.bootstrap.min.css'],
@@ -90,6 +90,7 @@ return [
         'AdminLTE.css' => ['theme' => 'vendor/admin-lte/dist/css/AdminLTE.css'],
         'AdminLTE.all.skins.css' => ['theme' => 'vendor/admin-lte/dist/css/skins/_all-skins.min.css'],
         'asgard.css' => ['theme' => 'css/asgard.css'],
+        'flag-icon.css' => ['theme' => 'vendor/flag-icon-css/css/flag-icon.min.css'],
         //'gridstack.css' => ['module' => 'dashboard:vendor/gridstack/dist/gridstack.min.css'],
         'gridstack.css' => ['module' => 'dashboard:gridstack/gridstack.min.css'],
         'daterangepicker.css' => ['theme' => 'vendor/admin-lte/plugins/daterangepicker/daterangepicker-bs3.css'],
@@ -106,7 +107,7 @@ return [
         'jquery.dataTables.js' => ['theme' => 'vendor/datatables.net/js/jquery.dataTables.min.js'],
         'dataTables.bootstrap.js' => ['theme' => 'vendor/datatables.net-bs/js/dataTables.bootstrap.min.js'],
         'jquery.slug.js' => ['theme' => 'js/vendor/jquery.slug.js'],
-        'app.js' => ['theme' => 'vendor/admin-lte/dist/js/app.js'],
+        'adminlte.js' => ['theme' => 'vendor/admin-lte/dist/js/adminlte.min.js'],
         'keypressAction.js' => ['module' => 'core:js/keypressAction.js'],
         'ckeditor.js' => ['theme' => 'js/vendor/ckeditor/ckeditor.js'],
         'lodash.js' => ['module' => 'dashboard:vendor/lodash/lodash.min.js'],
@@ -137,8 +138,6 @@ return [
         'css' => [
             'bootstrap.css',
             'font-awesome.css',
-            'alertify.core.css',
-            'alertify.default.css',
             'dataTables.bootstrap.css',
             'icheck.blue.css',
             'AdminLTE.css',
@@ -147,17 +146,17 @@ return [
             'pace.css',
             'selectize-default.css',
             'asgard.css',
+            'flag-icon.css',
         ],
         'js' => [
             'bootstrap.js',
             'mousetrap.js',
-            'alertify.js',
             'icheck.js',
             'jquery.dataTables.js',
             'dataTables.bootstrap.js',
             'jquery.slug.js',
             'keypressAction.js',
-            'app.js',
+            'adminlte.js',
             'pace.js',
             'selectize.js',
             'main.js',
@@ -168,6 +167,18 @@ return [
     |--------------------------------------------------------------------------
     | Enable module view overrides at theme locations
     |--------------------------------------------------------------------------
+    | By default you can only have module views in resources/views/asgard/[module]
+    | setting this setting to true will add ability for you to store those views
+    | in any of front or backend themes in my-theme/views/modules/[module]/...
+    |
+    | useViewNamespaces.backend-theme needs to be enabled at module level
     */
     'enable-theme-overrides' => false,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Check if asgard was installed
+    |--------------------------------------------------------------------------
+    */
+    'is_installed' => env('INSTALLED', false),
 ];

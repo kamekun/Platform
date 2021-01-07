@@ -6,77 +6,95 @@
         "asgardcms",
         "multilingual",
         "laravel",
-        "laravel5"
+        "laravel8"
     ],
     "license": "MIT",
     "type": "project",
     "require": {
-        "php": ">=7.0.0",
-        "fideloper/proxy": "~3.3",
-        "laravel/framework": "5.5.*",
-        "nwidart/laravel-modules": "~2.0",
-        "cartalyst/sentinel": "~2.0",
-        "idavoll/core-module": "~3.0",
-        "idavoll/dashboard-module": "~3.0",
-        "idavoll/user-module": "~3.0",
-        "idavoll/setting-module": "~3.0",
-        "idavoll/media-module": "~3.0",
-        "idavoll/page-module": "~3.0",
-        "idavoll/menu-module": "~3.0",
-        "idavoll/workshop-module": "~3.0",
-        "idavoll/translation-module": "~3.0",
-        "idavoll/tag-module": "~3.0",
-        "idavoll/flatly-theme": "~3.0",
-        "idavoll/adminlte-theme": "~3.0",
-        "laravel/tinker": "~1.0"
+        "php": "^7.3",
+        "astrotomic/laravel-translatable": "^11.9",
+        "cartalyst/sentinel": "^5.0",
+        "doctrine/dbal": "^2.11",
+        "fideloper/proxy": "^4.4",
+        "fruitcake/laravel-cors": "^2.0",
+        "guzzlehttp/guzzle": "^7.0.1",
+        "nwidart/laravel-menus": "^7.0",
+        "imagina/stylist": "^3.0",
+        "intervention/image": "^2.5",
+        "laracasts/presenter": "^0.2.4",
+        "laravelcollective/html": "^6.0",
+        "laravel/framework": "^8.13",
+        "laravel/tinker": "^2.5",
+        "laravel/ui": "^3.0",
+        "maatwebsite/laravel-sidebar": "^2.4",
+        "mcamara/laravel-localization": "^1.6",
+        "nwidart/laravel-modules": "^8.0",
+        "ramsey/uuid": "^4.0",
+        "symfony/yaml": "^5.1",
+        "tightenco/ziggy": "^0.9.4",
+        "typicms/nestablecollection": "^1.1",
+        "venturecraft/revisionable": "^1.35",
+        "yajra/laravel-datatables-oracle": "~9.0",
+        "idavoll/adminlte-theme": "4.0.x-dev",
+        "idavoll/core-module": "4.0.x-dev",
+        "idavoll/dashboard-module": "4.0.x-dev",
+        "idavoll/flatly-theme": "4.0.x-dev",
+        "idavoll/media-module": "4.0.x-dev",
+        "idavoll/menu-module": "4.0.x-dev",
+        "idavoll/page-module": "4.0.x-dev",
+        "idavoll/setting-module": "4.0.x-dev",
+        "idavoll/tag-module": "4.0.x-dev",
+        "idavoll/translation-module": "4.0.x-dev",
+        "idavoll/user-module": "4.0.x-dev",
+        "idavoll/workshop-module": "4.0.x-dev"
+
     },
     "require-dev": {
-        "fzaninotto/faker": "~1.4",
-        "mockery/mockery": "0.9.*",
-        "phpunit/phpunit": "~6.0",
-        "filp/whoops": "~2.0",
-        "symfony/css-selector": "3.1.*",
-        "symfony/dom-crawler": "3.1.*",
-        "barryvdh/laravel-debugbar": "~3.0",
-        "orchestra/testbench": "^3.5",
+        "barryvdh/laravel-debugbar": "^3.5",
+        "fzaninotto/faker": "^1.9.1",
         "league/flysystem-aws-s3-v3": "^1.0",
-        "league/commonmark": "^0.15.4"
+        "mockery/mockery": "^1.3.1",
+        "nunomaduro/collision": "^5.0",
+        "orchestra/testbench": "^6.2",
+        "phpunit/phpunit": "~9.4.0",
+        "predis/predis": "^1.1",
+        "facade/ignition": "^2.3.6"
     },
     "autoload": {
-        "classmap": [
-            "database"
-        ],
         "psr-4": {
             "App\\": "app/",
-            "Modules\\": "Modules/"
+            "Modules\\": "Modules/",
+            "Database\\Factories\\": "database/factories/",
+            "Database\\Seeders\\": "database/seeders/"
         }
     },
     "autoload-dev": {
-        "classmap": [
-            "tests/TestCase.php"
-        ]
-    },
-    "scripts": {
-        "post-install-cmd": [
-            "php artisan clear-compiled",
-            "php artisan optimize"
-        ],
-        "pre-update-cmd": [],
-        "post-autoload-dump": [
-            "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
-            "@php artisan package:discover"
-        ]
-    },
-    "config": {
-        "preferred-install": "dist"
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "3.0.x-dev"
+            "dev-master": "4.0.x-dev"
         },
         "laravel": {
             "dont-discover": []
         }
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "@php artisan clear-compiled"
+        ],
+        "pre-update-cmd": [],
+        "post-autoload-dump": [
+            "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
+            "@php artisan package:discover --ansi"
+        ]
+    },
+    "config": {
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "optimize-autoloader": true
     },
     "minimum-stability": "dev",
     "prefer-stable": true

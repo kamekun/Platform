@@ -1,6 +1,35 @@
 url: https://github.com/AsgardCms/Platform
 versions:
-    "3.0.0@unreleased":
+    "@unreleased":
+        added:
+            - Laravel 5.6 compatibility
+    "3.6.0":
+        added:
+            - New MediaMuliple component for vuejs projects
+    "3.5.1":
+        changed:
+            - Modify media controller to use Imagy non-statically
+    "3.5.0":
+        changed:
+            - Let File implement the <code>Responsable</code> interface which allows it being returned from a controller directly.
+    "3.4.0":
+        changed:
+            - Fixed vuejs compatibility
+    "3.1.0":
+        added:
+            - Creating an UploadZone component
+            - Creating the media list component for media modal
+            - Creating a single media vue component
+            - New media permissions for folders
+            - Creating NewFolder component
+            - Creating UploadButton component
+            - Ability to arrange Media in folders
+            - Ability to move files inside folders
+            - Ability to move folders inside folders
+        changed:
+            - Allow pdfs to be uploaded by default too
+            - Fixed SingleMedia component to correctly unset a selected media
+    "3.0.0":
         added:
             - New <code>MaxFolderSizeRule</code> class, using new validator classes in laravel 5.5
         changed:

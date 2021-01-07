@@ -28,11 +28,7 @@ class ApiKeysController extends AdminBaseController
 
     public function index()
     {
-        $tokens = $this->userToken->allForUser($this->auth->id());
-
-        $this->assetPipeline->requireJs('clipboard.js');
-
-        return view('user::admin.account.api-keys.index', compact('tokens'));
+        return view('user::admin.account.api-keys.index');
     }
 
     public function create()
@@ -45,6 +41,11 @@ class ApiKeysController extends AdminBaseController
 
     public function destroy(UserToken $userToken)
     {
+        if ($this->userToken->allForUser($this->auth->id())->count() === 1) {
+            return redirect()->route('admin.account.api.index')
+                ->withFail(trans('user::users.last token can not be deleted'));
+        }
+
         $this->userToken->destroy($userToken);
 
         return redirect()->route('admin.account.api.index')

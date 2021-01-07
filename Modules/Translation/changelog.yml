@@ -1,6 +1,18 @@
 url: https://github.com/AsgardCms/Platform
 versions:
-    "3.0.0@unreleased":
+    "@unreleased":
+        added:
+            - Laravel 5.6 compatibility
+    "3.5.0":
+        added:
+            - Added Korean (ko) translations
+    "3.4.0":
+        changed:
+            - Dutch translations updated
+    "3.1.0":
+        added:
+            - New translations for Media and Page modules
+    "3.0.0":
         changed:
             - The translation menu item weight has been changed to <code>40</code>.
     "2.6.0":

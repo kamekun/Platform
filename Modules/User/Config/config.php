@@ -77,16 +77,17 @@ return [
     | Set the fields that will be casted by Eloquent
     */
     'casts' => [
+        'permissions' => 'json',
     ],
     /*
-     |--------------------------------------------------------------------------
-     | Dynamic relations
-     |--------------------------------------------------------------------------
-     | Add relations that will be dynamically added to the User entity
+    |--------------------------------------------------------------------------
+    | Dynamic relations
+    |--------------------------------------------------------------------------
+    | Add relations that will be dynamically added to the User entity
      */
     'relations' => [
-//        'extension' => function ($self) {
-//            return $self->belongsTo(UserExtension::class, 'user_id', 'id')->first();
+//        'extension' => function (): \Illuminate\Database\Eloquent\Relations\BelongsTo {
+//            return $this->belongsTo(UserExtension::class, 'user_id', 'id')->first();
 //        }
     ],
     /*

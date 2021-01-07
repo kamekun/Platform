@@ -2,6 +2,7 @@
 
 namespace Modules\Workshop\Tests;
 
+use Illuminate\Support\Str;
 use Modules\Workshop\Scaffold\Module\Exception\ModuleExistsException;
 use Modules\Workshop\Scaffold\Module\ModuleScaffold;
 
@@ -28,7 +29,7 @@ class ModuleScaffoldTest extends BaseTestCase
      */
     protected $testModuleSanitizedName;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->testModuleName = 'Testing_The-TestModule';
         $this->testModuleSanitizedName = 'TestingTheTestModule';
@@ -48,7 +49,7 @@ class ModuleScaffoldTest extends BaseTestCase
      */
     public static function delTree($dir)
     {
-        $files = array_diff(scandir($dir), array('.', '..'));
+        $files = array_diff(scandir($dir), ['.', '..']);
         foreach ($files as $file) {
             (is_dir("$dir/$file")) ? self::delTree("$dir/$file") : unlink("$dir/$file");
         }
@@ -104,7 +105,7 @@ class ModuleScaffoldTest extends BaseTestCase
             ->scaffold();
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         if (file_exists(__DIR__ . '/../Modules/')) {
             self::delTree(__DIR__ . '/../Modules/');
@@ -277,15 +278,20 @@ class ModuleScaffoldTest extends BaseTestCase
         $file = $this->finder->get($this->testModulePath . "/Providers/{$this->testModuleSanitizedName}ServiceProvider.php");
 
         $sidebarEventListenerName = "Register{$this->testModuleSanitizedName}Sidebar";
-        $this->assertTrue(str_contains(
+        $this->assertTrue(Str::contains(
             $file,
             '$this->loadMigrationsFrom(__DIR__ . \'/../Database/Migrations\');'
         ), 'Migrations arent loaded');
 
-        $this->assertTrue(str_contains(
+        $this->assertTrue(Str::contains(
             $file,
             '$this->app[\'events\']->listen(BuildingSidebar::class, ' . $sidebarEventListenerName . '::class);'
         ), 'Sidebar event handler was not present');
+
+        $this->assertTrue(Str::contains(
+            $file,
+            '$this->app[\'events\']->listen(LoadingBackendTranslations::class,'
+        ), 'Translations registering was not present');
 
         $this->cleanUp();
     }
@@ -335,7 +341,7 @@ class ModuleScaffoldTest extends BaseTestCase
     {
         $this->scaffoldModuleWithEloquent();
 
-        $file = $this->finder->isFile($this->testModulePath . "/Events/Handlers/Register{$this->testModuleSanitizedName}Sidebar.php");
+        $file = $this->finder->isFile($this->testModulePath . "/Listeners/Register{$this->testModuleSanitizedName}Sidebar.php");
 
         $this->assertTrue($file);
 
@@ -347,10 +353,10 @@ class ModuleScaffoldTest extends BaseTestCase
     {
         $this->scaffoldModuleWithEloquent();
 
-        $file = $this->finder->get($this->testModulePath . "/Events/Handlers/Register{$this->testModuleSanitizedName}Sidebar.php");
+        $file = $this->finder->get($this->testModulePath . "/Listeners/Register{$this->testModuleSanitizedName}Sidebar.php");
 
-        $this->assertTrue(str_contains($file, '$menu->group'));
-        $this->assertTrue(str_contains($file, "class Register{$this->testModuleSanitizedName}Sidebar"));
+        $this->assertTrue(Str::contains($file, '$menu->group'));
+        $this->assertTrue(Str::contains($file, "class Register{$this->testModuleSanitizedName}Sidebar"));
 
         $this->cleanUp();
     }
@@ -360,10 +366,10 @@ class ModuleScaffoldTest extends BaseTestCase
     {
         $this->scaffoldModule('Eloquent', [], []);
 
-        $file = $this->finder->get($this->testModulePath . "/Events/Handlers/Register{$this->testModuleSanitizedName}Sidebar.php");
+        $file = $this->finder->get($this->testModulePath . "/Listeners/Register{$this->testModuleSanitizedName}Sidebar.php");
 
-        $this->assertFalse(str_contains($file, '$menu->group'));
-        $this->assertTrue(str_contains($file, 'return $menu'));
+        $this->assertFalse(Str::contains($file, '$menu->group'));
+        $this->assertTrue(Str::contains($file, 'return $menu'));
 
         $this->cleanUp();
     }
@@ -503,13 +509,13 @@ class ModuleScaffoldTest extends BaseTestCase
     }
 
     /** @test */
-    public function it_sets_module_order_to_1_in_module_json_file()
+    public function it_sets_module_priority_to_1_in_module_json_file()
     {
         $this->scaffoldModuleWithEloquent();
 
         $moduleJson = $this->getModuleFile();
 
-        $this->assertEquals(1, $moduleJson->order);
+        $this->assertEquals(1, $moduleJson->priority);
     }
 
     /** @test */
@@ -527,7 +533,7 @@ class ModuleScaffoldTest extends BaseTestCase
         ];
 
         foreach ($matches as $match) {
-            $this->assertContains($match, $controllerContents);
+            $this->assertStringContainsString($match, $controllerContents);
         }
 
         $this->cleanUp();
@@ -543,9 +549,19 @@ class ModuleScaffoldTest extends BaseTestCase
         $path = $this->testModulePath . '/Http/backendRoutes.php';
         $file = $this->finder->get($path);
         $this->assertTrue($this->finder->isFile($path));
-        $this->assertContains('overwritten by custom config', $file);
+        $this->assertStringContainsString('overwritten by custom config', $file);
 
         $this->cleanUp();
+    }
+
+    /** @test */
+    public function it_add_default_version_on_module_json_file()
+    {
+        $this->scaffoldModuleWithEloquent();
+
+        $moduleFile = $this->getModuleFile();
+
+        $this->assertEquals('1.0.0', $moduleFile->version);
     }
 
     /**

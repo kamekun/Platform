@@ -4,6 +4,7 @@ return [
     'pages' => 'Pages',
     'create page' => 'Create a page',
     'edit page' => 'Edit a page',
+    'name' => 'Name',
 
     'slug' => 'Slug',
     'title' => 'Title',
@@ -18,6 +19,9 @@ return [
     'template' => 'Page template name',
     'is homepage' => 'Homepage ?',
     'body' => 'Body',
+    'status' => 'Is it available in frontend?',
+    'live' => 'Page Live on Website',
+    'pages were updated' => 'Pages were updated',
 
     'back to index' => 'Go back to the pages index',
     'list resource' => 'List pages',
@@ -25,6 +29,8 @@ return [
     'edit resource' => 'Edit pages',
     'destroy resource' => 'Delete pages',
 
+    'view-page' => 'View page',
+    'edit-page' => 'Edit page',
     'validation' => [
         'attributes' => [
             'title' => 'title',

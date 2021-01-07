@@ -8,6 +8,7 @@ return [
 
     'template is required' => 'Il nome del template è richiesto.',
     'title is required' => 'Il titolo è richiesto.',
+    'slug is required' => 'Lo slug è richiesto.',
     'body is required' => 'Il corpo è richiesto.',
     'only one homepage allowed' => 'Solo una homepage è consentita',
 ];

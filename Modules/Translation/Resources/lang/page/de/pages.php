@@ -5,7 +5,7 @@ return [
     'create page' => 'Seite erstellen',
     'edit page' => 'Bearbeiten einer Seite',
     'name' => 'Name',
-    'slug' => 'Slug',
+    'status' => 'Status',
     'title' => 'Titel',
     'slug' => 'Slug',
     'meta_title' => 'Meta-Titel',
@@ -27,5 +27,7 @@ return [
         'product' => 'Produkt',
         'article' => 'Artikel',
     ],
-    'back to index' => 'Zurück zur Übersicht',
+    'navigation' => [
+        'back to index' => 'Zurück zur Übersicht',
+    ],
 ];

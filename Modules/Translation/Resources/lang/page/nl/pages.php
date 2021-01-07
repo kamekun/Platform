@@ -2,10 +2,10 @@
 
 return [
     'pages' => 'Pagina\'s',
-    'create page' => 'Creëer een pagina',
-    'edit page' => 'Wijzig een pagina',
+    'create page' => 'Pagina aanmaken',
+    'edit page' => 'Pagina wijzigen',
     'name' => 'Naam',
-    'slug' => 'Pad',
+    'slug' => 'URL slug',
     'title' => 'Titel',
     'meta_data' => 'Meta data',
     'meta_title' => 'Meta titel',
@@ -17,7 +17,16 @@ return [
     'template' => 'Pagina template naam',
     'is homepage' => 'Startpagina?',
     'body' => 'Inhoud',
+    'status' => 'Status',
+    'pages were updated' => 'De paginas zijn gewijzigd',
 
+    'list resource' => 'Pagina overzicht',
+    'create resource' => 'Pagina\'s aanmaken',
+    'edit resource' => 'Pagina\'s wijzigen',
+    'destroy resource' => 'Pagina\'s verwijderen',
+
+    'view-page' => 'De pagina bekijken',
+    'edit-page' => 'De pagina bewerken',
     'validation' => [
         'attributes' => [
             'title' => 'titel',
@@ -29,5 +38,7 @@ return [
         'product' => 'Product',
         'article' => 'Artikel',
     ],
-    'back to index' => 'Ga terug naar het pagina overzicht',
+    'navigation' => [
+        'back to index' => 'Ga terug naar het pagina overzicht',
+    ],
 ];

@@ -1,9 +1,7 @@
 <?php
 
 return [
-    'button' => [
-        'new-role' => 'Nuovo ruolo',
-    ],
+    'new-role' => 'Nuovo ruolo',
     'title' => [
         'roles' => 'Ruoli',
         'edit' => 'Modifica ruolo',
@@ -16,6 +14,7 @@ return [
     ],
     'table' => [
         'name' => 'Nome',
+        'slug' => 'Slug',
     ],
     'tabs' => [
         'data' => 'Data',
@@ -31,4 +30,14 @@ return [
     'select all' => 'Seleziona tutti',
     'deselect all' => 'Deseleziona tutti',
     'swap' => 'Scambia',
+    'allow all' => 'Permetti tutti',
+    'deny all' => 'Nega tutti',
+    'inherit all' => 'Eredita tutti',
+    'allow' => 'Permetti',
+    'deny' => 'Nega',
+    'inherit' => 'Eredita da ruolo',
+    'list resource' => 'Elenca ruoli',
+    'create resource' => 'Crea ruoli',
+    'edit resource' => 'Modifica ruoli',
+    'destroy resource' => 'Elimina ruoli',
 ];

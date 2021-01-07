@@ -31,8 +31,13 @@ return [
         'uri' => 'URI',
         'url' => 'URL',
         'primary' => 'Menú principal (usado para rutas del sitio)',
+        'description' => 'Descripción del menú (Se puede usar para proporcionar información adicional)',
     ],
     'navigation' => [
         'back to index' => 'Regresar',
     ],
+    'list resource' => 'Listar menús',
+    'create resource' => 'Crear menús',
+    'edit resource' => 'Editar menús',
+    'destroy resource' => 'Eliminar menús',
 ];

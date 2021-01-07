@@ -3,8 +3,10 @@
 namespace Modules\Media\Providers;
 
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
+use Illuminate\Support\Arr;
 use Illuminate\Support\ServiceProvider;
 use Modules\Core\Events\BuildingSidebar;
+use Modules\Core\Events\LoadingBackendTranslations;
 use Modules\Core\Traits\CanGetSidebarClassForModule;
 use Modules\Core\Traits\CanPublishConfiguration;
 use Modules\Media\Blade\MediaMultipleDirective;
@@ -14,12 +16,21 @@ use Modules\Media\Console\RefreshThumbnailCommand;
 use Modules\Media\Contracts\DeletingMedia;
 use Modules\Media\Contracts\StoringMedia;
 use Modules\Media\Entities\File;
+use Modules\Media\Events\FolderIsDeleting;
+use Modules\Media\Events\FolderWasCreated;
+use Modules\Media\Events\FolderWasUpdated;
+use Modules\Media\Events\Handlers\CreateFolderOnDisk;
+use Modules\Media\Events\Handlers\DeleteAllChildrenOfFolder;
+use Modules\Media\Events\Handlers\DeleteFolderOnDisk;
 use Modules\Media\Events\Handlers\HandleMediaStorage;
 use Modules\Media\Events\Handlers\RegisterMediaSidebar;
 use Modules\Media\Events\Handlers\RemovePolymorphicLink;
+use Modules\Media\Events\Handlers\RenameFolderOnDisk;
 use Modules\Media\Image\ThumbnailManager;
 use Modules\Media\Repositories\Eloquent\EloquentFileRepository;
+use Modules\Media\Repositories\Eloquent\EloquentFolderRepository;
 use Modules\Media\Repositories\FileRepository;
+use Modules\Media\Repositories\FolderRepository;
 use Modules\Tag\Repositories\TagManager;
 
 class MediaServiceProvider extends ServiceProvider
@@ -57,6 +68,15 @@ class MediaServiceProvider extends ServiceProvider
             BuildingSidebar::class,
             $this->getSidebarClassForModule('media', RegisterMediaSidebar::class)
         );
+
+        $this->app['events']->listen(LoadingBackendTranslations::class, function (LoadingBackendTranslations $event) {
+            $event->load('media', Arr::dot(trans('media::media')));
+            $event->load('folders', Arr::dot(trans('media::folders')));
+        });
+
+        app('router')->bind('media', function ($id) {
+            return app(FileRepository::class)->find($id);
+        });
     }
 
     public function boot(DispatcherContract $events)
@@ -67,6 +87,10 @@ class MediaServiceProvider extends ServiceProvider
 
         $events->listen(StoringMedia::class, HandleMediaStorage::class);
         $events->listen(DeletingMedia::class, RemovePolymorphicLink::class);
+        $events->listen(FolderWasCreated::class, CreateFolderOnDisk::class);
+        $events->listen(FolderWasUpdated::class, RenameFolderOnDisk::class);
+        $events->listen(FolderIsDeleting::class, DeleteFolderOnDisk::class);
+        $events->listen(FolderIsDeleting::class, DeleteAllChildrenOfFolder::class);
 
         $this->app[TagManager::class]->registerNamespace(new File());
         $this->registerThumbnails();
@@ -82,13 +106,16 @@ class MediaServiceProvider extends ServiceProvider
      */
     public function provides()
     {
-        return array();
+        return [];
     }
 
     private function registerBindings()
     {
         $this->app->bind(FileRepository::class, function () {
             return new EloquentFileRepository(new File());
+        });
+        $this->app->bind(FolderRepository::class, function () {
+            return new EloquentFolderRepository(new File());
         });
     }
 

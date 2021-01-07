@@ -1,6 +1,24 @@
 url: https://github.com/AsgardCms/Platform
 versions:
-    "3.0.0@unreleased":
+    "3.6.0":
+        added:
+            - New <code>@hasSetting()</code> and <code>@endHasSetting</code> directives
+            - Laravel 5.6 compatibility
+    "3.5.3":
+        added:
+            - New setting type media-single
+    "3.4.0":
+        changed:
+            - Fix settings with falsey values not getting returned
+            - Using new <code>remember</code> method in the <code>CacheSettingDecorator</code> class
+    "3.1.0":
+        changed:
+            - Checking for null value instead of empty for non translatable settings
+            - Escaping the output of the @setting blade directive
+    "3.0.3":
+        changed:
+            - Make setting value nullable
+    "3.0.0":
         changed:
             - Fixing active class on settings module list sidebar
             - The setting menu item weight has been changed to <code>20</code>.

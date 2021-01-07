@@ -2,6 +2,7 @@
 
 namespace Modules\Media\Blade;
 
+use Illuminate\Support\Arr;
 use Modules\Media\Composers\Backend\PartialAssetComposer;
 
 class MediaMultipleDirective
@@ -34,6 +35,8 @@ class MediaMultipleDirective
 
         $name = $this->name ?: ucwords(str_replace('_', ' ', $this->zone));
 
+        $media = null;
+
         if ($this->entity !== null) {
             $media = $this->entity->filesByZone($this->zone)->get();
         }
@@ -47,9 +50,9 @@ class MediaMultipleDirective
      */
     private function extractArguments(array $arguments)
     {
-        $this->zone = array_get($arguments, 0);
-        $this->entity = array_get($arguments, 1);
-        $this->view = array_get($arguments, 2);
-        $this->name = array_get($arguments, 3);
+        $this->zone = Arr::get($arguments, 0);
+        $this->entity = Arr::get($arguments, 1);
+        $this->view = Arr::get($arguments, 2);
+        $this->name = Arr::get($arguments, 3);
     }
 }

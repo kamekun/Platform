@@ -33,13 +33,9 @@ class CacheSettingDecorator extends BaseCacheDecorator implements SettingReposit
      */
     public function findByName($settingName)
     {
-        return $this->cache
-            ->tags([$this->entityName, 'global'])
-            ->remember("{$this->locale}.{$this->entityName}.findByName.{$settingName}", $this->cacheTime,
-                function () use ($settingName) {
-                    return $this->repository->findByName($settingName);
-                }
-            );
+        return $this->remember(function () use ($settingName) {
+            return $this->repository->findByName($settingName);
+        });
     }
 
     /**
@@ -50,15 +46,9 @@ class CacheSettingDecorator extends BaseCacheDecorator implements SettingReposit
      */
     public function moduleSettings($modules)
     {
-        $moduleList = implode(',', $modules);
-
-        return $this->cache
-            ->tags([$this->entityName, 'global'])
-            ->remember("{$this->locale}.{$this->entityName}.moduleSettings.{$moduleList}", $this->cacheTime,
-                function () use ($modules) {
-                    return $this->repository->moduleSettings($modules);
-                }
-            );
+        return $this->remember(function () use ($modules) {
+            return $this->repository->moduleSettings($modules);
+        });
     }
 
     /**
@@ -68,13 +58,9 @@ class CacheSettingDecorator extends BaseCacheDecorator implements SettingReposit
      */
     public function savedModuleSettings($module)
     {
-        return $this->cache
-            ->tags([$this->entityName, 'global'])
-            ->remember("{$this->locale}.{$this->entityName}.savedModuleSettings.{$module}", $this->cacheTime,
-                function () use ($module) {
-                    return $this->repository->savedModuleSettings($module);
-                }
-            );
+        return $this->remember(function () use ($module) {
+            return $this->repository->savedModuleSettings($module);
+        });
     }
 
     /**
@@ -84,13 +70,9 @@ class CacheSettingDecorator extends BaseCacheDecorator implements SettingReposit
      */
     public function findByModule($module)
     {
-        return $this->cache
-            ->tags([$this->entityName, 'global'])
-            ->remember("{$this->locale}.{$this->entityName}.findByModule.{$module}", $this->cacheTime,
-                function () use ($module) {
-                    return $this->repository->findByModule($module);
-                }
-            );
+        return $this->remember(function () use ($module) {
+            return $this->repository->findByModule($module);
+        });
     }
 
     /**
@@ -100,13 +82,9 @@ class CacheSettingDecorator extends BaseCacheDecorator implements SettingReposit
      */
     public function get($settingName)
     {
-        return $this->cache
-            ->tags([$this->entityName, 'global'])
-            ->remember("{$this->locale}.{$this->entityName}.get.{$settingName}", $this->cacheTime,
-                function () use ($settingName) {
-                    return $this->repository->get($settingName);
-                }
-            );
+        return $this->remember(function () use ($settingName) {
+            return $this->repository->get($settingName);
+        });
     }
 
     /**
@@ -116,13 +94,9 @@ class CacheSettingDecorator extends BaseCacheDecorator implements SettingReposit
      */
     public function translatableModuleSettings($module)
     {
-        return $this->cache
-            ->tags([$this->entityName, 'global'])
-            ->remember("{$this->locale}.{$this->entityName}.translatableModuleSettings.{$module}", $this->cacheTime,
-                function () use ($module) {
-                    return $this->repository->translatableModuleSettings($module);
-                }
-            );
+        return $this->remember(function () use ($module) {
+            return $this->repository->translatableModuleSettings($module);
+        });
     }
 
     /**
@@ -132,12 +106,8 @@ class CacheSettingDecorator extends BaseCacheDecorator implements SettingReposit
      */
     public function plainModuleSettings($module)
     {
-        return $this->cache
-            ->tags([$this->entityName, 'global'])
-            ->remember("{$this->locale}.{$this->entityName}.plainModuleSettings.{$module}", $this->cacheTime,
-                function () use ($module) {
-                    return $this->repository->plainModuleSettings($module);
-                }
-            );
+        return $this->remember(function () use ($module) {
+            return $this->repository->plainModuleSettings($module);
+        });
     }
 }

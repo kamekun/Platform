@@ -4,6 +4,7 @@ namespace Modules\Media\Image;
 
 use GuzzleHttp\Psr7\Stream;
 use Illuminate\Contracts\Filesystem\Factory;
+use Illuminate\Support\Arr;
 use Intervention\Image\ImageManager;
 use Modules\Media\Entities\File;
 use Modules\Media\ValueObjects\MediaPath;
@@ -58,7 +59,7 @@ class Imagy
             return;
         }
 
-        $filename = config('asgard.media.config.files-path') . $this->newFilename($path, $thumbnail);
+        $filename = $this->getFilenameFor($path, $thumbnail);
 
         if ($this->returnCreatedFile($filename, $forceCreate)) {
             return $filename;
@@ -93,7 +94,7 @@ class Imagy
             return (new MediaPath($originalImage))->getRelativeUrl();
         }
 
-        $path = config('asgard.media.config.files-path') . $this->newFilename($originalImage, $thumbnail);
+        $path = $this->getFilenameFor($originalImage, $thumbnail);
 
         return (new MediaPath($path))->getUrl();
     }
@@ -110,11 +111,14 @@ class Imagy
 
         foreach ($this->manager->all() as $thumbnail) {
             $image = $this->image->make($this->filesystem->disk($this->getConfiguredFilesystem())->get($this->getDestinationPath($path->getRelativeUrl())));
-            $filename = config('asgard.media.config.files-path') . $this->newFilename($path, $thumbnail->name());
+
+            $filename = $this->getFilenameFor($path, $thumbnail);
+
             foreach ($thumbnail->filters() as $manipulation => $options) {
                 $image = $this->imageFactory->make($manipulation)->handle($image, $options);
             }
-            $image = $image->stream(pathinfo($path, PATHINFO_EXTENSION), array_get($thumbnail->filters(), 'quality', 90));
+
+            $image = $image->stream(pathinfo($path, PATHINFO_EXTENSION), Arr::get($thumbnail->filters(), 'quality', 90));
             $this->writeImage($filename, $image);
         }
     }
@@ -203,10 +207,10 @@ class Imagy
         }
 
         $paths[] = $this->getDestinationPath($file->path->getRelativeUrl());
-        $fileName = pathinfo($file->path, PATHINFO_FILENAME);
-        $extension = pathinfo($file->path, PATHINFO_EXTENSION);
+
         foreach ($this->manager->all() as $thumbnail) {
-            $path = config('asgard.media.config.files-path') . "{$fileName}_{$thumbnail->name()}.{$extension}";
+            $path = $this->getFilenameFor($file->path, $thumbnail);
+
             if ($this->fileExists($this->getDestinationPath($path))) {
                 $paths[] = (new MediaPath($this->getDestinationPath($path)))->getRelativeUrl();
             }
@@ -240,5 +244,40 @@ class Imagy
         }
 
         return $path;
+    }
+
+    /**
+     * @param MediaPath $path
+     * @param Thumbnail|string $thumbnail
+     * @return string
+     */
+    private function getFilenameFor(MediaPath $path, $thumbnail)
+    {
+        if ($thumbnail instanceof  Thumbnail) {
+            $thumbnail = $thumbnail->name();
+        }
+        $filenameWithoutPrefix = $this->removeConfigPrefix($path->getRelativeUrl());
+        $filename = substr(strrchr($filenameWithoutPrefix, '/'), 1);
+        $folders = str_replace($filename, '', $filenameWithoutPrefix);
+
+        if ($filename === false) {
+            return config('asgard.media.config.files-path') . $this->newFilename($path, $thumbnail);
+        }
+
+        return config('asgard.media.config.files-path') . $folders . $this->newFilename($path, $thumbnail);
+    }
+
+    /**
+     * @param string $path
+     * @return string
+     */
+    private function removeConfigPrefix(string $path) : string
+    {
+        $configAssetPath = config('asgard.media.config.files-path');
+
+        return str_replace([
+            $configAssetPath,
+            ltrim($configAssetPath, '/'),
+        ], '', $path);
     }
 }

@@ -2,10 +2,12 @@
 
 namespace Modules\$MODULE$\Providers;
 
+use Illuminate\Database\Eloquent\Factory as EloquentFactory;
 use Illuminate\Support\ServiceProvider;
 use Modules\Core\Traits\CanPublishConfiguration;
 use Modules\Core\Events\BuildingSidebar;
-use Modules\$MODULE$\Events\Handlers\$SIDEBAR_LISTENER_NAME$;
+use Modules\Core\Events\LoadingBackendTranslations;
+use Modules\$MODULE$\Listeners\$SIDEBAR_LISTENER_NAME$;
 
 class $MODULE$ServiceProvider extends ServiceProvider
 {
@@ -26,6 +28,12 @@ class $MODULE$ServiceProvider extends ServiceProvider
     {
         $this->registerBindings();
         $this->app['events']->listen(BuildingSidebar::class, $SIDEBAR_LISTENER_NAME$::class);
+
+        $this->app['events']->listen(LoadingBackendTranslations::class, function (LoadingBackendTranslations $event) {
+            // append translations
+        });
+
+
     }
 
     public function boot()
@@ -49,4 +57,6 @@ class $MODULE$ServiceProvider extends ServiceProvider
     {
 // add bindings
     }
+
+
 }

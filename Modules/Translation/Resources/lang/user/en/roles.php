@@ -1,9 +1,7 @@
 <?php
 
 return [
-    'button' => [
-        'new-role' => 'New role',
-    ],
+    'new-role' => 'New role',
     'title' => [
         'roles' => 'Roles',
         'edit' => 'Edit role',
@@ -16,6 +14,7 @@ return [
     ],
     'table' => [
         'name' => 'Name',
+        'slug' => 'Slug',
     ],
     'tabs' => [
         'data' => 'Data',

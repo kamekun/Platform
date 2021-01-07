@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 COMPOSE="docker-compose"
 
@@ -7,9 +7,17 @@ if [ $# -gt 0 ]; then
         $COMPOSE up -d
     elif [ "$1" == "reload" ] || [ "$1" == "restart" ] || [ "$1" == "rs" ] || [ "$1" == "rl" ]; then
         $COMPOSE down && $COMPOSE up -d
-    elif [ "$1" == "artisan" ]; then
+    elif [ "$1" == "artisan" ] || [ "$1" == "art" ] || [ "$1" == "a" ]; then
         shift 1
         EXEC_CMD="cd /var/www/html && php artisan $@"
+        $COMPOSE exec app bash -c "$EXEC_CMD"
+    elif [ "$1" == "bin/console" ]; then
+        shift 1
+        EXEC_CMD="cd /var/www/html && php bin/console $@"
+        $COMPOSE exec app bash -c "$EXEC_CMD"
+    elif [ "$1" == "app/console" ]; then
+        shift 1
+        EXEC_CMD="cd /var/www/html && php app/console $@"
         $COMPOSE exec app bash -c "$EXEC_CMD"
     elif [ "$1" == "test" ]; then
         shift 1
@@ -27,6 +35,14 @@ if [ $# -gt 0 ]; then
     elif [ "$1" == "npm" ]; then
         shift 1
         $COMPOSE run --rm -w /var/www/html node npm $@
+    elif [ "$1" == "php" ]; then
+        shift 1
+        EXEC_CMD="cd /var/www/html && php $@"
+        $COMPOSE exec app bash -c "$EXEC_CMD"
+    elif [ "$1" == "node" ]; then
+        shift 1
+        EXEC_CMD="cd /var/www/html && node $@"
+        $COMPOSE exec app bash -c "$EXEC_CMD"
     else
         $COMPOSE $@
     fi

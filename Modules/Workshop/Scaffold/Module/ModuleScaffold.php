@@ -5,6 +5,7 @@ namespace Modules\Workshop\Scaffold\Module;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Str;
 use Modules\Workshop\Scaffold\Module\Exception\ModuleExistsException;
 use Modules\Workshop\Scaffold\Module\Generators\EntityGenerator;
 use Modules\Workshop\Scaffold\Module\Generators\FilesGenerator;
@@ -101,6 +102,7 @@ class ModuleScaffold
 
         $this->filesGenerator->forModule($this->name)
             ->generateModuleProvider()
+            ->generateEventProvider()
             ->generate($this->files);
 
         $this->cleanUpModuleJson();
@@ -138,7 +140,7 @@ class ModuleScaffold
      */
     public function getName()
     {
-        return studly_case($this->name);
+        return Str::studly($this->name);
     }
 
     /**
@@ -214,7 +216,6 @@ class ModuleScaffold
         $this->renameVendorName();
         $this->removeViewResources();
 
-        $this->finder->delete($this->getModulesPath('Http/routes.php'));
         $this->finder->delete($this->getModulesPath("Http/Controllers/{$this->name}Controller.php"));
     }
 
@@ -227,7 +228,7 @@ class ModuleScaffold
 
         $moduleJson = $this->loadProviders($moduleJson);
         $moduleJson = $this->setModuleOrderOrder($moduleJson);
-        $moduleJson = $this->removeStartPhpFile($moduleJson);
+        $moduleJson = $this->setModuleVersion($moduleJson);
 
         $this->finder->put($this->getModulesPath('module.json'), $moduleJson);
     }
@@ -241,6 +242,7 @@ class ModuleScaffold
     {
         $newProviders = <<<JSON
 "Modules\\\\{$this->name}\\\Providers\\\\{$this->name}ServiceProvider",
+        "Modules\\\\{$this->name}\\\Providers\\\\EventServiceProvider",
         "Modules\\\\{$this->name}\\\Providers\\\RouteServiceProvider"
 JSON;
 
@@ -256,20 +258,17 @@ JSON;
      */
     private function setModuleOrderOrder($content)
     {
-        return str_replace('"order": 0,', '"order": 1,', $content);
+        return str_replace('"priority": 0,', '"priority": 1,', $content);
     }
 
     /**
-     * Remove the start.php start file
-     * Also removes the auto loading of that file
+     * Set the module version to 1.0.0 by default
      * @param string $content
      * @return string
      */
-    private function removeStartPhpFile($content)
+    private function setModuleVersion($content)
     {
-        $this->finder->delete($this->getModulesPath('start.php'));
-
-        return str_replace('"start.php"', '', $content);
+        return str_replace("\"description\"", "\"version\": \"1.0.0\",\n\t\"description\"", $content);
     }
 
     /**
@@ -301,15 +300,15 @@ JSON;
         $replace = <<<JSON
 "description": "",
     "type": "asgard-module",
-    "license": "MIT", 
+    "license": "MIT",
     "require": {
-        "php": ">=7.0.0",
+        "php": "^7.1.3",
         "composer/installers": "~1.0",
-        "idavoll/core-module": "~3.0"
+        "idavoll/core-module": "4.0.x-dev"
     },
     "require-dev": {
-        "phpunit/phpunit": "~6.0",
-        "orchestra/testbench": "3.5.*"
+        "phpunit/phpunit": "~7.0",
+        "orchestra/testbench": "3.8.*"
     },
     "autoload-dev": {
         "psr-4": {

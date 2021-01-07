@@ -2,8 +2,10 @@
 
 namespace Modules\Dashboard\Providers;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\ServiceProvider;
 use Modules\Core\Events\BuildingSidebar;
+use Modules\Core\Events\LoadingBackendTranslations;
 use Modules\Core\Traits\CanGetSidebarClassForModule;
 use Modules\Core\Traits\CanPublishConfiguration;
 use Modules\Dashboard\Entities\Widget;
@@ -44,6 +46,10 @@ class DashboardServiceProvider extends ServiceProvider
             BuildingSidebar::class,
             $this->getSidebarClassForModule('dashboard', RegisterDashboardSidebar::class)
         );
+
+        $this->app['events']->listen(LoadingBackendTranslations::class, function (LoadingBackendTranslations $event) {
+            $event->load('dashboard', Arr::dot(trans('dashboard::dashboard')));
+        });
     }
 
     public function boot(StylistThemeManager $theme)
@@ -59,6 +65,7 @@ class DashboardServiceProvider extends ServiceProvider
 
         $this->publishConfig('dashboard', 'permissions');
         $this->publishConfig('dashboard', 'config');
+        $this->publishConfig('dashboard', 'settings');
         $this->loadMigrationsFrom(__DIR__ . '/../Database/Migrations');
     }
 
@@ -69,6 +76,6 @@ class DashboardServiceProvider extends ServiceProvider
      */
     public function provides()
     {
-        return array();
+        return [];
     }
 }

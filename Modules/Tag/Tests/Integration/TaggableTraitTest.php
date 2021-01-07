@@ -3,6 +3,7 @@
 namespace Modules\Tag\Tests\Integration;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Modules\Page\Entities\Page;
 use Modules\Page\Repositories\PageRepository;
 use Modules\Tag\Repositories\TagRepository;
@@ -19,7 +20,7 @@ class TaggableTraitTest extends BaseTestCase
      */
     private $page;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -130,6 +131,37 @@ class TaggableTraitTest extends BaseTestCase
         ]);
 
         $this->assertCount(3, Page::allTags()->get());
+    }
+
+    /** @test */
+    public function it_generates_slug_like_original_str_slug()
+    {
+        $page = $this->createPage();
+
+        $this->assertEquals(Str::slug('hello world'), $page->generateTagSlug('hello world'));
+        $this->assertEquals(Str::slug('hello world'), $page->generateTagSlug('hello-world'));
+        $this->assertEquals(Str::slug('hello_world'), $page->generateTagSlug('hello_world'));
+        $this->assertEquals(Str::slug('hello_world', '_'), $page->generateTagSlug('hello_world', '_'));
+        $this->assertEquals(Str::slug('user@host'), $page->generateTagSlug('user@host'));
+    }
+
+    /** @test */
+    public function it_gets_pages_with_non_latin_tags()
+    {
+        $this->createPage(['한글 태그']);
+
+        $this->assertCount(1, Page::whereTag(['한글-태그'])->get());
+    }
+
+    /** @test */
+    public function it_creates_page_without_tags()
+    {
+        $this->createPage(['original tag']);
+
+        $page = $this->page->find(1);
+        $page->setTags(null);
+
+        $this->assertEmpty(Page::first()->tags->count());
     }
 
     private function createPage(array $tags = [])

@@ -2,10 +2,12 @@
 
 namespace Modules\Page\Providers;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider;
 use Modules\Core\Events\BuildingSidebar;
 use Modules\Core\Events\CollectingAssets;
+use Modules\Core\Events\LoadingBackendTranslations;
 use Modules\Core\Traits\CanGetSidebarClassForModule;
 use Modules\Core\Traits\CanPublishConfiguration;
 use Modules\Page\Console\CreatePagesCommand;
@@ -40,6 +42,14 @@ class PageServiceProvider extends ServiceProvider
             BuildingSidebar::class,
             $this->getSidebarClassForModule('page', RegisterPageSidebar::class)
         );
+
+        $this->app['events']->listen(LoadingBackendTranslations::class, function (LoadingBackendTranslations $event) {
+            $event->load('pages', Arr::dot(trans('page::pages')));
+        });
+
+        app('router')->bind('page', function ($id) {
+            return app(PageRepository::class)->find($id);
+        });
     }
 
     public function boot()
@@ -62,7 +72,7 @@ class PageServiceProvider extends ServiceProvider
      */
     public function provides()
     {
-        return array();
+        return [];
     }
 
     private function registerBindings()

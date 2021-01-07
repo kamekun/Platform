@@ -7,6 +7,7 @@ use Modules\Core\Http\Controllers\Admin\AdminBaseController;
 use Modules\Core\Traits\CanRequireAssets;
 use Modules\Setting\Http\Requests\SettingRequest;
 use Modules\Setting\Repositories\SettingRepository;
+use Nwidart\Modules\Contracts\RepositoryInterface;
 use Nwidart\Modules\Module;
 
 class SettingController extends AdminBaseController
@@ -17,7 +18,7 @@ class SettingController extends AdminBaseController
      */
     private $setting;
     /**
-     * @var Module
+     * @var RepositoryInterface
      */
     private $module;
     /**
@@ -51,14 +52,16 @@ class SettingController extends AdminBaseController
     {
         $this->session->put('module', $currentModule->getLowerName());
 
-        $modulesWithSettings = $this->setting->moduleSettings($this->module->enabled());
+        $modulesWithSettings = $this->setting->moduleSettings($this->module->allEnabled());
 
         $translatableSettings = $this->setting->translatableModuleSettings($currentModule->getLowerName());
         $plainSettings = $this->setting->plainModuleSettings($currentModule->getLowerName());
 
         $dbSettings = $this->setting->savedModuleSettings($currentModule->getLowerName());
 
-        return view('setting::admin.module-settings',
-            compact('currentModule', 'translatableSettings', 'plainSettings', 'dbSettings', 'modulesWithSettings'));
+        return view(
+            'setting::admin.module-settings',
+            compact('currentModule', 'translatableSettings', 'plainSettings', 'dbSettings', 'modulesWithSettings')
+        );
     }
 }

@@ -3,16 +3,17 @@
 namespace Modules\Core\Composers;
 
 use Illuminate\Contracts\View\View;
+use Modules\Core\Events\LoadingBackendTranslations;
 
 class TranslationsViewComposer
 {
     public function compose(View $view)
     {
-        $staticTranslations = json_encode([
-            'page' => array_dot(trans('page::pages')),
-            'core' => array_dot(trans('core::core'))
-        ]);
+        if (app('asgard.onBackend') === false) {
+            return;
+        }
+        event($staticTranslations = new LoadingBackendTranslations());
 
-        $view->with(compact('staticTranslations'));
+        $view->with('staticTranslations', json_encode($staticTranslations->getTranslations()));
     }
 }

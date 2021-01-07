@@ -2,8 +2,10 @@
 
 namespace Modules\Workshop\Providers;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\ServiceProvider;
 use Modules\Core\Events\BuildingSidebar;
+use Modules\Core\Events\LoadingBackendTranslations;
 use Modules\Core\Services\Composer;
 use Modules\Core\Traits\CanGetSidebarClassForModule;
 use Modules\Core\Traits\CanPublishConfiguration;
@@ -20,6 +22,7 @@ use Modules\Workshop\Scaffold\Module\Generators\ValueObjectGenerator;
 use Modules\Workshop\Scaffold\Module\ModuleScaffold;
 use Modules\Workshop\Scaffold\Theme\ThemeGeneratorFactory;
 use Modules\Workshop\Scaffold\Theme\ThemeScaffold;
+use Nwidart\Modules\Contracts\RepositoryInterface;
 
 class WorkshopServiceProvider extends ServiceProvider
 {
@@ -45,6 +48,19 @@ class WorkshopServiceProvider extends ServiceProvider
             BuildingSidebar::class,
             $this->getSidebarClassForModule('workshop', RegisterWorkshopSidebar::class)
         );
+
+        $this->app['events']->listen(LoadingBackendTranslations::class, function (LoadingBackendTranslations $event) {
+            $event->load('workshop', Arr::dot(trans('workshop::workshop')));
+            $event->load('modules', Arr::dot(trans('workshop::modules')));
+            $event->load('themes', Arr::dot(trans('workshop::themes')));
+        });
+
+        app('router')->bind('module', function ($module) {
+            return app(RepositoryInterface::class)->find($module);
+        });
+        app('router')->bind('theme', function ($theme) {
+            return app(ThemeManager::class)->find($theme);
+        });
     }
 
     public function boot()

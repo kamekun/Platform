@@ -2,12 +2,12 @@
 
 namespace Modules\User\Permissions;
 
-use Nwidart\Modules\Module;
+use Nwidart\Modules\Contracts\RepositoryInterface;
 
 class PermissionManager
 {
     /**
-     * @var Module
+     * @var RepositoryInterface
      */
     private $module;
 
@@ -25,7 +25,7 @@ class PermissionManager
     public function all()
     {
         $permissions = [];
-        foreach ($this->module->enabled() as $enabledModule) {
+        foreach ($this->module->allEnabled() as $enabledModule) {
             $configuration = config(strtolower('asgard.' . $enabledModule->getName()) . '.permissions');
             if ($configuration) {
                 $permissions[$enabledModule->getName()] = $configuration;
@@ -61,11 +61,11 @@ class PermissionManager
      */
     protected function getState($checkedPermission)
     {
-        if ($checkedPermission === '1') {
+        if ($checkedPermission === '1' || $checkedPermission === 1) {
             return true;
         }
 
-        if ($checkedPermission === '-1') {
+        if ($checkedPermission === '-1' || $checkedPermission === -1) {
             return false;
         }
 

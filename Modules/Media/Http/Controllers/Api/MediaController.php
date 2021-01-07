@@ -11,10 +11,12 @@ use Modules\Media\Events\FileWasLinked;
 use Modules\Media\Events\FileWasUnlinked;
 use Modules\Media\Events\FileWasUploaded;
 use Modules\Media\Helpers\FileHelper;
+use Modules\Media\Http\Requests\UploadDropzoneMediaRequest;
 use Modules\Media\Http\Requests\UploadMediaRequest;
-use Modules\Media\Image\Facade\Imagy;
+use Modules\Media\Image\Imagy;
 use Modules\Media\Repositories\FileRepository;
 use Modules\Media\Services\FileService;
+use Modules\Media\Transformers\MediaTransformer;
 use Yajra\DataTables\Facades\DataTables;
 
 class MediaController extends Controller
@@ -47,14 +49,68 @@ class MediaController extends Controller
 
         return Datatables::eloquent($files)
             ->addColumn('thumbnail', function ($file) {
+                if ($file->isFolder()) {
+                    return '<i class="fa fa-folder" style="font-size: 20px;"></i>';
+                }
                 if ($file->isImage()) {
-                    return '<img src="' . Imagy::getThumbnail($file->path, 'smallThumb') . '"/>';
+                    return '<img src="' . $this->imagy->getThumbnail($file->path, 'smallThumb') . '"/>';
                 }
 
                 return '<i class="fa ' . FileHelper::getFaIcon($file->media_type) . '" style="font-size: 20px;"></i>';
             })
             ->rawColumns(['thumbnail'])
             ->toJson();
+    }
+
+    public function allVue(Request $request)
+    {
+        return MediaTransformer::collection($this->file->serverPaginationFilteringFor($request));
+    }
+
+    public function find(File $file)
+    {
+        return new MediaTransformer($file);
+    }
+
+    public function findFirstByZoneEntity(Request $request)
+    {
+        $imageable = DB::table('media__imageables')
+            ->where('imageable_id', $request->get('entity_id'))
+            ->whereZone($request->get('zone'))
+            ->whereImageableType($request->get('entity'))
+            ->first();
+
+        if ($imageable === null) {
+            return response()->json(null);
+        }
+
+        $file = $this->file->find($imageable->file_id);
+
+        if ($file === null) {
+            return response()->json(['data' => null]);
+        }
+
+        return new MediaTransformer($file);
+    }
+
+    /**
+     * Get a media collection by zone and entity object. Require some params that were passed to request: entity (Full class name of entity), entity_id and zone
+     *
+     * @param Request $request
+     * @return JsonResponse|\Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     */
+    public function getByZoneEntity(Request $request)
+    {
+        $entityName = (string)$request->get('entity');
+        $entityModel = new $entityName;
+        $entity = $entityModel::find($request->get('entity_id'));
+        if ($entity && in_array('Modules\Media\Support\Traits\MediaRelation', class_uses($entity)) && $entity->files()->count()) {
+            $files = $this->file->findMultipleFilesByZoneForEntity($request->get('zone'), $entity);
+
+            return MediaTransformer::collection($files);
+        }
+
+        return response()->json(['data' => null]);
     }
 
     /**
@@ -64,6 +120,21 @@ class MediaController extends Controller
      * @return \Illuminate\Http\JsonResponse
      */
     public function store(UploadMediaRequest $request) : JsonResponse
+    {
+        $savedFile = $this->fileService->store($request->file('file'), $request->get('parent_id'));
+
+        if (is_string($savedFile)) {
+            return response()->json([
+                'error' => $savedFile,
+            ], 409);
+        }
+
+        event(new FileWasUploaded($savedFile));
+
+        return response()->json($savedFile->toArray());
+    }
+
+    public function storeDropzone(UploadDropzoneMediaRequest $request) : JsonResponse
     {
         $savedFile = $this->fileService->store($request->file('file'));
 
@@ -76,6 +147,18 @@ class MediaController extends Controller
         event(new FileWasUploaded($savedFile));
 
         return response()->json($savedFile->toArray());
+    }
+
+    public function update(File $file, Request $request)
+    {
+        $data = $request->except(['filename', 'path', 'extension', 'size', 'id', 'thumbnails']);
+
+        $this->file->update($file, $data);
+
+        return response()->json([
+            'errors' => false,
+            'message' => trans('media::messages.file updated'),
+        ]);
     }
 
     /**
@@ -162,6 +245,17 @@ class MediaController extends Controller
         }
 
         return response()->json(['error' => false, 'message' => 'The items have been reorder.']);
+    }
+
+    public function destroy(File $file)
+    {
+        $this->imagy->deleteAllFor($file);
+        $this->file->destroy($file);
+
+        return response()->json([
+            'errors' => false,
+            'message' => trans('media::messages.file deleted'),
+        ]);
     }
 
     /**
